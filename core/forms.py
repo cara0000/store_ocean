@@ -10,6 +10,7 @@ class BlueBackgroundTextInput(forms.TextInput):
     class Media:
         CSS = {'all': ('core/css/blue_background_text_input.css',)}
 
+#FORM CON VALIDACIONES EN EL FRONT Y EN EL BACK -----------------------------------------------------------------------------------------------------------------
 class ContactoForm(forms.Form): #1:09 21 models 1
     nombre= forms.CharField(label='Nombre de contacto',widget=GreenBackgroundTextInput,required= True) #aca se ponen los placeholders
     apellido= forms.CharField(label='Apellido de contacto', widget=forms.TextInput(attrs= {'class': 'fondo_verde'}),required= True)
@@ -37,6 +38,7 @@ class ContactoForm(forms.Form): #1:09 21 models 1
         return self.cleaned_data
     
 
+# FORMULARIO ASOCIADO A UN MODELO
 class AltaProductoForm(forms.ModelForm): #alta de figura
     denominacion= forms.CharField(label='Denominacion',widget=GreenBackgroundTextInput,required= True)
     personaje = forms.ModelChoiceField(queryset=Personaje.objects.all(), empty_label="Seleccione un Personaje") #ChatGPT - revisar pa entender
@@ -47,7 +49,7 @@ class AltaProductoForm(forms.ModelForm): #alta de figura
     #imagen= forms.FileField(label='Imagen ilustrativa',widget=GreenBackgroundTextInput,required= True)
     class Meta: #ChatGPT - revisar pa entender
         model = Figura
-        fields = ['denominacion', 'personaje', 'coleccion', 'compañias', 'precio']
+        fields = '__all__'
 
 
 class AltaPersonajeForm(forms.Form):

@@ -17,6 +17,8 @@ class Compañia(models.Model):
     def __str__(self):
         return self.nombre
 
+# RELACION DE UNO A MUCHOS: PERSONAJE - FIGURAS
+# RELACION DE MUCHOS A MUCHOS: COMPAÑIAS - FIGURAS
 class Figura(models.Model):
     denominacion= models.CharField(max_length=50, verbose_name='Denominación/Nombre')# por omision, los campos son NoNull, para eso sirve poner default=0 (en caso e ya tener datos cargados y querer agregar nuevas columnas)
     personaje= models.ForeignKey(Personaje, on_delete= models.CASCADE) #1 personaje puede tener muchas figuras - me refiero a la tabla Personaje - el on_delete models CASCADE me rompe todo porque si borro Personaje estoy mirando a alg oque no existe si es que lo borro. Entonces on cascade si borro un personaje me lleov puesto todas las figuras que estan asociadas a ese personaje (deberia plantearse al reves la relacion pero no hay tiempo)

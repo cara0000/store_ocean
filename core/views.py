@@ -6,7 +6,7 @@ from django.contrib import messages
 from .models import Figura, Personaje, Compañia
 from django.views.generic.edit import CreateView
 
-
+# TEMPLATE ASOCIADO A UNA VISTA---------------------------------------
 def index(request):
     return render(request, 'core/index.html')
 
@@ -99,6 +99,7 @@ def alta_producto(request):
 
     return render(request, 'core/alta_producto.html', context)
 '''
+# FORMULARIO USADO EN VISTA BASADA EN CLASES ------------------------------------------------------------------
 class AltaProductoView(CreateView):
     model = Figura
     form_class = AltaProductoForm
