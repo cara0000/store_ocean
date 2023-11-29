@@ -3,33 +3,28 @@ from django.http import HttpResponse
 from .forms import ContactoForm, AltaProductoForm, AltaPersonajeForm, AltaEmpresaForm
 from django.urls import reverse
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from .models import Figura, Personaje, Compañia
 from django.views.generic.edit import CreateView
+from django.utils.decorators import method_decorator
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.decorators import permission_required
+from django.contrib.auth.mixins import PermissionRequiredMixin
 
 # TEMPLATE ASOCIADO A UNA VISTA---------------------------------------
 def index(request):
     return render(request, 'core/index.html')
 
-def contacto(request): #checkear 21 models 1 - 1:09
-
-    #print(request.POST) #aca tengo todo lo que envio el user en forma de diccionario
-    if request.method == "POST": #si el metodo por el cual me enviaron el form es un post
-        #instanciar el form con los datos que se cargaron
-        formulario= ContactoForm(request.POST) #creamos form y le paso los datos del post, me permite validarlo despues
+def contacto(request):
+    if request.method == "POST":
+        formulario= ContactoForm(request.POST)
         
-        #valido el form cargado ()
-        if formulario.is_valid(): #si el form es valido se corre ValidationError, se hace una conversion de lo que viene del request a tipos de daots que maneja python (strings, etc)
-            #dar de alta la info (esto esta pendiente para cuando tengas BD)
-            #redirecciono al inicio para que no vuelvan a llenar el form vacio
+        if formulario.is_valid(): 
             messages.info(request,'Consulta enviada exitosamente🌸')
             return redirect(reverse('index'))
 
-    else: #GET (necesito que el form este vacio - form "no vinculado")
+    else:
         formulario= ContactoForm()
-        #si yo necesitara poner un campo con un dato precargado se hace aca en plan
-        #formulario= ContactoForm(
-        # lugar_de_importacion= 'Argentina' (ah re siome, pero se entiende)
-        # )
 
     context= {
         'contacto_form': formulario
@@ -37,68 +32,6 @@ def contacto(request): #checkear 21 models 1 - 1:09
 
     return render(request, 'core/contacto.html', context)
 
-'''
-def listar_productos(request):
-    return render(request, 'core/listado_productos.html')
-'''
-
-#CREATE----------------------------------------------------------------------------------------------------------------------------------
-'''
-def alta_producto(request):
-    context= {}
-
-    if request.method == 'POST':
-        alta_form = AltaProductoForm(request.POST)
-
-        if alta_form.is_valid():
-            nuevo_producto = Figura(
-                denominacion= alta_form.cleaned_data['denominacion'],
-                personaje= alta_form.cleaned_data['personaje'],
-                coleccion= alta_form.cleaned_data['coleccion'],
-                compañias= alta_form.cleaned_data['compañias'],
-                precio= alta_form.cleaned_data['precio'],
-                #fecha_salida= alta_form.cleaned_data['fecha_salida'],
-                #imagen= alta_form.cleaned_data['imagen'],
-            )
-            nuevo_producto.save(commit=False) #ChatGPT
-
-            compañias = alta_form.cleaned_data['compañias'] #ChatGPT
-            nuevo_producto.save() #ChatGPT
-
-            nuevo_producto.compañias.set(compañias)
-
-
-            messages.info(request, 'Producto dado de alta correctamente')
-            return redirect(reverse('index'))
-
-    else:
-        alta_form = AltaProductoForm()
-
-    context['alta_producto_form'] = AltaProductoForm
-
-    return render(request, 'core/alta_producto.html', context)
-
-
-#esta es la que va pero voy a intentar reemplazarla por una CBV
-def alta_producto(request):
-    context = {}
-
-    if request.method == 'POST':
-        alta_form = AltaProductoForm(request.POST)
-
-        if alta_form.is_valid():
-            nuevo_producto = alta_form.save()  # Save the instance
-
-            messages.info(request, 'Producto dado de alta correctamente')
-            return redirect(reverse('index'))
-
-    else:
-        alta_form = AltaProductoForm()
-
-    context['alta_producto_form'] = alta_form
-
-    return render(request, 'core/alta_producto.html', context)
-'''
 # FORMULARIO USADO EN VISTA BASADA EN CLASES ------------------------------------------------------------------
 class AltaProductoView(CreateView):
     model = Figura
@@ -117,10 +50,7 @@ class AltaProductoView(CreateView):
         context['alta_producto_form'] = self.form_class()
         return context
 
-
-
-#agregar un personajes registrados 2023 que sea parametrizado
-
+@permission_required('core.add_personaje', login_url='/login/', raise_exception=True)
 def alta_personaje(request):
     context= {}
     alta_form = AltaPersonajeForm(request.POST)
@@ -141,6 +71,7 @@ def alta_personaje(request):
 
     return render(request, 'core/alta_personaje.html', context)
 
+@permission_required('core.add_personaje', login_url='/login/', raise_exception=True)
 def alta_empresa(request):
     context= {}
     alta_form = AltaEmpresaForm(request.POST)
@@ -162,7 +93,9 @@ def alta_empresa(request):
     return render(request, 'core/alta_empresa.html', context)
 
 #READ----------------------------------------------------------------------------------------------------------------------------------
+#VISTA PARAMETRIZADA ------------------------------------------------------------------------------------------------------------------
 
+@login_required
 def listar_productos(request):
     listado = Figura.objects.all().order_by('id')
 
@@ -173,7 +106,7 @@ def listar_productos(request):
 
     return render(request, 'core/listado_productos.html',context)
 
-
+@login_required
 def listar_personajes(request):
     listado= Personaje.objects.all().order_by('id')
 
@@ -184,7 +117,7 @@ def listar_personajes(request):
 
     return render(request, 'core/listado_personajes.html', context)
 
-
+@login_required
 def listar_empresas(request):
     listado= Compañia.objects.all().order_by('id')
 

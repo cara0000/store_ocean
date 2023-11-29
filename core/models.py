@@ -2,7 +2,7 @@ from django.db import models
 from django.core.exceptions import ValidationError
 
 
-class Personaje(models.Model): #categoria a muchos cursos) ESTE DEBERIA SER CURSO
+class Personaje(models.Model):
     nombre= models.CharField(max_length=50, verbose_name='Nombre')
     anime= models.CharField(max_length=50, verbose_name='Anime/Serie')
 
@@ -32,28 +32,26 @@ class Figura(models.Model):
         return self.denominacion
 
 '''
-    def clean_precio(self): #no me funciona - 23 models 3 - 20:03
+    def clean_precio(self): #no me funciona
         if self.cleaned_data['precio'] <= 0:
             raise ValidationError('El precio debe ser un número positivo')
         return self.cleaned_data['precio']
 '''   
 
-#defino migraciones, django fijate si hay cosas que cambiaron: 
-#python manage.py makemigrations core (se planifican cambios)
-#una vez que cree las migraciones, las tengo que aplicar (pasarlas a la BD):
-#python manage.py migrate core (se aplican cambios)
+class Persona(models.Model):
+    nombre = models.CharField(max_length=100, verbose_name='Nombre')
+    apellido = models.CharField(max_length=150, verbose_name='Apellido')
+    email = models.EmailField(max_length=150, verbose_name='Email')
+    dni = models.IntegerField(verbose_name='DNI')
 
-#para ir para atras con las migraciones:
-#...tore_ocean\store_ocean> python manage.py migrate core 0001_initial
+class Vendedor(Persona):
+    legajo = models.IntegerField(verbose_name='Legajo')
+    
+    def __str__(self):
+        return f'{self.nombre} {self.apellido}'
 
-#para arrancar desde cero, osea revertir la primera migracion:
-#...l_store_ocean\store_ocean> python manage.py migrate core zero
-#ahora puedo borrar las migraciones en la carpeta core>migrations (0001_initial.py y las demas. EL INIT NO LO BORRO Y EL PYCACHE TAMPOCO)
-
-
-'''
-class Compañia(models.Model):
-    nombre= models.CharField(max_length=40, verbose_name='Nombre')
-    ubicacion= models.CharField(max_length=40, null=True, verbose_name='Ubicación')
-    categoria= 
-'''
+class Administrador(Persona):
+    legajo = models.IntegerField(verbose_name='Legajo')
+    
+    def __str__(self):
+        return f'{self.nombre} {self.apellido}'

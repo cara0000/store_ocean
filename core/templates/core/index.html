@@ -11,3 +11,12 @@
 {% block section_title %}{% filter upper %}
     inicio
 {% endfilter %}{% endblock %}
+
+{% block content %}
+    <h1>Figuras with precio > {{ min_price }}</h1>
+
+    <ul>
+        {% for figura in filtered_figuras %}
+            <li>{{ figura.denominacion }} - Precio: {{ figura.precio }}</li>
+        {% endfor %}
+</ul>{% endblock %}
