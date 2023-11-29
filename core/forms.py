@@ -1,5 +1,6 @@
 from django import forms
 from django.core.exceptions import ValidationError
+from .models import Personaje, Compañia, Figura  #ChatGPT - revisar pa entender
 
 class GreenBackgroundTextInput(forms.TextInput): #extender un widget para crear uno propio
     class Media:
@@ -36,14 +37,18 @@ class ContactoForm(forms.Form): #1:09 21 models 1
         return self.cleaned_data
     
 
-class AltaProductoForm(forms.Form):
+class AltaProductoForm(forms.ModelForm): #alta de figura
     denominacion= forms.CharField(label='Denominacion',widget=GreenBackgroundTextInput,required= True)
-    personaje= forms.IntegerField(label='Personaje',widget=GreenBackgroundTextInput,required= True) #che esto no deberia ser un integerfield?
+    personaje = forms.ModelChoiceField(queryset=Personaje.objects.all(), empty_label="Seleccione un Personaje") #ChatGPT - revisar pa entender
     coleccion= forms.CharField(label='Coleccion',widget=GreenBackgroundTextInput,required= True)
-    compañia= forms.IntegerField(label='Compañia',widget=GreenBackgroundTextInput,required= True)
+    compañias = forms.ModelMultipleChoiceField(queryset=Compañia.objects.all(), widget=forms.CheckboxSelectMultiple) #ChatGPT - revisar pa entender
     precio= forms.FloatField(label='Precio',widget=GreenBackgroundTextInput,required= True)
     #fecha_salida= forms.DateTimeField(label='Fecha de salida',widget=GreenBackgroundTextInput,required= True)
     #imagen= forms.FileField(label='Imagen ilustrativa',widget=GreenBackgroundTextInput,required= True)
+    class Meta: #ChatGPT - revisar pa entender
+        model = Figura
+        fields = ['denominacion', 'personaje', 'coleccion', 'compañias', 'precio']
+
 
 class AltaPersonajeForm(forms.Form):
     nombre= forms.CharField(label='Nombre',widget=BlueBackgroundTextInput,required= True)
@@ -52,4 +57,3 @@ class AltaPersonajeForm(forms.Form):
 class AltaEmpresaForm(forms.Form):
     nombre= forms.CharField(label='Nombre',widget=BlueBackgroundTextInput,required= True)
     ubicacion= forms.CharField(label='Pais/región',widget=BlueBackgroundTextInput,required= True)
-    personajes= forms.IntegerField(label='ID personaje',widget=BlueBackgroundTextInput,required= True)

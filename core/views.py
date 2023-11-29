@@ -4,6 +4,7 @@ from .forms import ContactoForm, AltaProductoForm, AltaPersonajeForm, AltaEmpres
 from django.urls import reverse
 from django.contrib import messages
 from .models import Figura, Personaje, Compañia
+from django.views.generic.edit import CreateView
 
 
 def index(request):
@@ -42,6 +43,7 @@ def listar_productos(request):
 '''
 
 #CREATE----------------------------------------------------------------------------------------------------------------------------------
+'''
 def alta_producto(request):
     context= {}
 
@@ -53,12 +55,19 @@ def alta_producto(request):
                 denominacion= alta_form.cleaned_data['denominacion'],
                 personaje= alta_form.cleaned_data['personaje'],
                 coleccion= alta_form.cleaned_data['coleccion'],
-                compañia= alta_form.cleaned_data['compañia'],
+                compañias= alta_form.cleaned_data['compañias'],
                 precio= alta_form.cleaned_data['precio'],
                 #fecha_salida= alta_form.cleaned_data['fecha_salida'],
                 #imagen= alta_form.cleaned_data['imagen'],
             )
-            nuevo_producto.save()
+            nuevo_producto.save(commit=False) #ChatGPT
+
+            compañias = alta_form.cleaned_data['compañias'] #ChatGPT
+            nuevo_producto.save() #ChatGPT
+
+            nuevo_producto.compañias.set(compañias)
+
+
             messages.info(request, 'Producto dado de alta correctamente')
             return redirect(reverse('index'))
 
@@ -69,6 +78,47 @@ def alta_producto(request):
 
     return render(request, 'core/alta_producto.html', context)
 
+
+#esta es la que va pero voy a intentar reemplazarla por una CBV
+def alta_producto(request):
+    context = {}
+
+    if request.method == 'POST':
+        alta_form = AltaProductoForm(request.POST)
+
+        if alta_form.is_valid():
+            nuevo_producto = alta_form.save()  # Save the instance
+
+            messages.info(request, 'Producto dado de alta correctamente')
+            return redirect(reverse('index'))
+
+    else:
+        alta_form = AltaProductoForm()
+
+    context['alta_producto_form'] = alta_form
+
+    return render(request, 'core/alta_producto.html', context)
+'''
+class AltaProductoView(CreateView):
+    model = Figura
+    form_class = AltaProductoForm
+    template_name = 'core/alta_producto.html'
+
+    def form_valid(self, form):
+        messages.info(self.request, 'Producto dado de alta correctamente')
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse('index')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['alta_producto_form'] = self.form_class()
+        return context
+
+
+
+#agregar un personajes registrados 2023 que sea parametrizado
 
 def alta_personaje(request):
     context= {}
@@ -90,7 +140,6 @@ def alta_personaje(request):
 
     return render(request, 'core/alta_personaje.html', context)
 
-    
 def alta_empresa(request):
     context= {}
     alta_form = AltaEmpresaForm(request.POST)
@@ -145,4 +194,5 @@ def listar_empresas(request):
 
     return render(request, 'core/listado_compañias.html', context)
 
-#UPDATE------------------------------------------------------------------------------------------------------------------------------
+#UPDATE------------------------------------------------------------------------------------------------------------------------------ clase 23 models 3 - antes de 0:53
+#DELETE------------------------------------------------------------------------------------------------------------------------------
